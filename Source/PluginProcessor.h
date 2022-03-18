@@ -36,13 +36,13 @@
 //==============================================================================
 /**
 */
-struct BlockLFO
+struct BlockLPF
 {
-    BlockLFO()
+    BlockLPF()
     {
 
     }
-    ~BlockLFO()
+    ~BlockLPF()
     {
 
     }
@@ -114,6 +114,7 @@ public:
     // Constants
     static const int wSCBSize = 500;
     static const int numOutputChannels = 2;
+    static const int maxPanFrames = 50;
 
     struct GlobalData
     {
@@ -135,6 +136,14 @@ public:
         int howlWSCBReadIndex2 = wSCBSize - 51;
         float howlWindSpeed1;
         float howlWindSpeed2;
+    };
+
+    struct PanData
+    {
+        float whistlePan1;
+        float whistlePan2;
+        float howlPan1;
+        float howlPan2;
     };
 
 private:
@@ -186,12 +195,13 @@ private:
     juce::dsp::StateVariableTPTFilter<float> howlBPF2;
     juce::dsp::Oscillator<float> howlOsc1;
     juce::dsp::Oscillator<float> howlOsc2;
-    BlockLFO howlBlockLPF1;
-    BlockLFO howlBlockLPF2;
+    BlockLPF howlBlockLPF1;
+    BlockLPF howlBlockLPF2;
 
     //  Internal Variables
     juce::dsp::ProcessSpec currentSpec;
     GlobalData gd;
+    PanData pd;
 
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Wind4Unity3AudioProcessor)

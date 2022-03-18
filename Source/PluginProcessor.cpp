@@ -287,9 +287,9 @@ void Wind4Unity3AudioProcessor::whsProcess(juce::AudioBuffer<float>& buffer)
 
     //    Whistle DSP Loop
     float pan1[2];
-    cosPan(pan1, whsPan1->get());
+    cosPan(pan1, pd.whistlePan1);
     float pan2[2];
-    cosPan(pan2, whsPan2->get());
+    cosPan(pan2, pd.whistlePan2);
     float AmpMod1 = juce::square(juce::jmax(0.0f, wd.whsWindSpeed1 * 0.02f - 0.1f));
     float AmpMod2 = juce::square(juce::jmax(0.0f, wd.whsWindSpeed2 * 0.02f - 0.1f));
 
@@ -313,9 +313,9 @@ void Wind4Unity3AudioProcessor::howlProcess(juce::AudioBuffer<float>& buffer)
 
     //    Whistle DSP Loop
     float pan1[2];
-    cosPan(pan1, howlPan1->get());
+    cosPan(pan1, pd.howlPan1);
     float pan2[2];
-    cosPan(pan2, howlPan2->get());
+    cosPan(pan2, pd.howlPan2);
     float AmpMod1 = howlBlockLPF1.processSample(juce::dsp::FastMathApproximations::cos(
         ((juce::jlimit(0.35f, 0.6f, hd.howlWindSpeed1 * 0.02f)
          - 0.35f) * 2.0f - 0.25f) * juce::MathConstants<float>::twoPi));
@@ -340,34 +340,44 @@ void Wind4Unity3AudioProcessor::howlProcess(juce::AudioBuffer<float>& buffer)
 void Wind4Unity3AudioProcessor::updateSettings()
 {
     //  UpdateWSCircularBuffer;
+
     float currentWindSpeed = windSpeed->get();
     gd.windSpeedCircularBuffer[gd.wSCBWriteIndex] = currentWindSpeed;
     ++gd.wSCBWriteIndex;
     gd.wSCBWriteIndex = (gd.wSCBWriteIndex < wSCBSize) ? gd.wSCBWriteIndex : 0;
-    
-    //  Update DST
+
+    // Get Pan Data
+
+    pd.whistlePan1 = whsPan1->get();
+    pd.whistlePan2 = whsPan2->get();
+    pd.howlPan1 = howlPan1->get();
+    pd.howlPan2 = howlPan2->get();
+
+    // Update DST
     float currentDstIntensity = dstIntensity->get();
     float currentDstResonance = dstResonance->get();
-    //    Update DST Filter Settings
+    // Update DST Filter Settings
     dstBPF.setCutoffFrequency(currentWindSpeed * currentDstIntensity);
     dstBPF.setResonance(currentDstResonance);
-    //    Update Whistle
+
+    // Update Whistle
+    
+    wd.whsWSCBReadIndex1 = gd.wSCBWriteIndex - (int)(pd.whistlePan1 * maxPanFrames);
+    wd.whsWSCBReadIndex1 = (wd.whsWSCBReadIndex1 < 0) ? wd.whsWSCBReadIndex1 + wSCBSize : wd.whsWSCBReadIndex1;
+    wd.whsWSCBReadIndex2 = gd.wSCBWriteIndex - (int)(pd.whistlePan2 * maxPanFrames);
+    wd.whsWSCBReadIndex2 = (wd.whsWSCBReadIndex2 < 0) ? wd.whsWSCBReadIndex2 + wSCBSize : wd.whsWSCBReadIndex2;
     wd.whsWindSpeed1 = gd.windSpeedCircularBuffer[wd.whsWSCBReadIndex1];
     wd.whsWindSpeed2 = gd.windSpeedCircularBuffer[wd.whsWSCBReadIndex2];
     whsBPF1.setCutoffFrequency(wd.whsWindSpeed1 * 8.0f + 600.0f);
     whsBPF2.setCutoffFrequency(wd.whsWindSpeed2 * 20.0f + 1000.0f);
-    ++wd.whsWSCBReadIndex1;
-    ++wd.whsWSCBReadIndex2;
-    wd.whsWSCBReadIndex1 = (wd.whsWSCBReadIndex1 < wSCBSize) ? wd.whsWSCBReadIndex1 : 0;
-    wd.whsWSCBReadIndex2 = (wd.whsWSCBReadIndex2 < wSCBSize) ? wd.whsWSCBReadIndex2 : 0;
 
     //    Update Howl
+    hd.howlWSCBReadIndex1 = gd.wSCBWriteIndex - (int)(pd.howlPan1 * maxPanFrames);
+    hd.howlWSCBReadIndex1 = (hd.howlWSCBReadIndex1 < 0) ? hd.howlWSCBReadIndex1 + wSCBSize : hd.howlWSCBReadIndex1;
+    hd.howlWSCBReadIndex2 = gd.wSCBWriteIndex - (int)(pd.howlPan2 * maxPanFrames);
+    hd.howlWSCBReadIndex2 = (hd.howlWSCBReadIndex2 < 0) ? hd.howlWSCBReadIndex2 + wSCBSize : hd.howlWSCBReadIndex2;
     hd.howlWindSpeed1 = gd.windSpeedCircularBuffer[hd.howlWSCBReadIndex1];
     hd.howlWindSpeed2 = gd.windSpeedCircularBuffer[hd.howlWSCBReadIndex2];
-    ++hd.howlWSCBReadIndex1;
-    ++hd.howlWSCBReadIndex2;
-    hd.howlWSCBReadIndex1 = (hd.howlWSCBReadIndex1 < wSCBSize) ? hd.howlWSCBReadIndex1 : 0;
-    hd.howlWSCBReadIndex2 = (hd.howlWSCBReadIndex2 < wSCBSize) ? hd.howlWSCBReadIndex2 : 0;
 }
 
 void Wind4Unity3AudioProcessor::cosPan(float* output, float pan)
