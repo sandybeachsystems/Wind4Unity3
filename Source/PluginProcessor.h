@@ -114,7 +114,7 @@ public:
     // Constants
     static const int wSCBSize = 500;
     static const int numOutputChannels = 2;
-    static const int maxPanFrames = 50;
+    static const int maxPanFrames = 20;
 
     struct GlobalData
     {
