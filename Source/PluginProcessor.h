@@ -31,7 +31,6 @@
 #pragma once
 
 #include <JuceHeader.h>
-//#include <random>
 
 //==============================================================================
 /**
@@ -39,6 +38,7 @@
 */
 class BlockLPF
 {
+public:
     BlockLPF()
     {
     }
@@ -46,8 +46,6 @@ class BlockLPF
     ~BlockLPF()
     {
     }
-
-public:
 
     void prepare(float cutoff, int samplesPerBlock, double sampleRate)
     {
