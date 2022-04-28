@@ -76,7 +76,6 @@ void Wind4Unity3AudioProcessor::prepareToPlay (double sampleRate, int samplesPer
     juce::dsp::ProcessSpec spec;
     spec.maximumBlockSize = samplesPerBlock;
     spec.numChannels = 1;
-    // spec.numChannels = getTotalNumOutputChannels();
     spec.sampleRate = sampleRate;
     currentSpec = spec;
 
@@ -101,8 +100,6 @@ void Wind4Unity3AudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, 
     howlProcess(buffer);
 
     buffer.applyGain(gain->get());
-
-
 }
 
 //==============================================================================
@@ -211,7 +208,7 @@ void Wind4Unity3AudioProcessor::howlProcess(juce::AudioBuffer<float>& buffer)
     int numSamples = buffer.getNumSamples();
     float FrameAmp = howlAmplitude->get();
 
-    //    Whistle DSP Loop
+    //    Howl DSP Loop
     float pan1[2];
     cosPan(pan1, pd.howlPan1);
     float pan2[2];

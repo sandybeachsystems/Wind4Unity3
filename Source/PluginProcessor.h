@@ -31,20 +31,20 @@
 #pragma once
 
 #include <JuceHeader.h>
-#include <random>
+//#include <random>
 
 //==============================================================================
 /**
+ A Single pole low pass filter
 */
-struct BlockLPF
+class BlockLPF
 {
     BlockLPF()
     {
-
     }
+    
     ~BlockLPF()
     {
-
     }
 
 public:
