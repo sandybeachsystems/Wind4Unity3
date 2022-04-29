@@ -279,8 +279,8 @@ void Wind4Unity3AudioProcessor::updateSettings()
 
 void Wind4Unity3AudioProcessor::cosPan(float* output, float pan)
 {
-    output[0] = std::cosf((pan * 0.25f - 0.5f) * juce::MathConstants<float>::twoPi);
-    output[1] = std::cosf((pan * 0.25f - 0.25f) * juce::MathConstants<float>::twoPi);
+    output[0] = juce::dsp::FastMathApproximations::cos((pan * 0.25f - 0.5f) * juce::MathConstants<float>::twoPi);
+    output[1] = juce::dsp::FastMathApproximations::cos((pan * 0.25f - 0.25f) * juce::MathConstants<float>::twoPi);
 }
 
 //==============================================================================
